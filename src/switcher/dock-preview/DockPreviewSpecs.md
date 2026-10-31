@@ -17,6 +17,12 @@ Windows taskbar. Setting: "Window previews on Dock hover" (`dockPreviews`, on by
   press elsewhere, and whenever the switcher is summoned.
 - It opens above a bottom Dock and beside a left or right Dock, centered on the icon and kept on screen.
   When the windows don't fit along the screen, every thumbnail shrinks by the same factor.
+- With Dock auto-hide on, the Dock stays on screen while the panel is open, so the pointer can travel from
+  the icon to the panel. The panel turns auto-hide off when it opens and back on when it closes, as the
+  System Settings switch would. If the app quits or crashes while the panel is open, the next launch turns
+  auto-hide back on (the `dockAutohideHeld` default marks a hold in progress).
+- An auto-hiding Dock reports the hovered icon while it is still sliding in, so the icon's frame is read
+  again when the panel opens, and once more after the slide-in (0.35s) if the hold had to stop the Dock.
 
 ## How hover is detected
 

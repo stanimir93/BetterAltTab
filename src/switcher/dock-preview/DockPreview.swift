@@ -1,9 +1,14 @@
 import Cocoa
 
-/// A Dock icon under the pointer. `frame` is top-left global (Quartz), like `Window.position`.
+/// A Dock icon under the pointer. `frame` is top-left global (Quartz), like `Window.position`, read when the
+/// icon was hovered. An auto-hiding Dock may still be sliding in at that point, see `DockHoverEvents.settled`.
 struct DockItem: Equatable {
     let appUrl: URL
     let frame: CGRect
+    let icon: AXUIElement
+
+    /// Same icon; the frame may differ.
+    static func == (a: DockItem, b: DockItem) -> Bool { a.appUrl == b.appUrl && CFEqual(a.icon, b.icon) }
 }
 
 /// Reports which Dock icon the pointer is over. The Dock's single AXList posts
@@ -60,12 +65,27 @@ class DockHoverEvents {
         guard let selected: [AXUIElement] = attribute(list, kAXSelectedChildrenAttribute), let icon = selected.first,
               (attribute(icon, kAXSubroleAttribute) as String?) == "AXApplicationDockItem",
               let url: URL = attribute(icon, kAXURLAttribute),
-              let position: AXValue = attribute(icon, kAXPositionAttribute),
+              let frame = frame(icon) else { return nil }
+        return DockItem(appUrl: url, frame: frame, icon: icon)
+    }
+
+    /// `item` with its icon's current frame, delivered on the main thread. An auto-hiding Dock reports the
+    /// hovered icon as soon as the pointer touches the screen edge, while the Dock is still sliding in, so the
+    /// frame read then is off by up to the Dock's height.
+    static func settled(_ item: DockItem, _ completion: @escaping (DockItem) -> Void) {
+        BackgroundWork.missionControlThread.async {
+            let current = frame(item.icon).map { DockItem(appUrl: item.appUrl, frame: $0, icon: item.icon) } ?? item
+            DispatchQueue.main.async { completion(current) }
+        }
+    }
+
+    private static func frame(_ icon: AXUIElement) -> CGRect? {
+        guard let position: AXValue = attribute(icon, kAXPositionAttribute),
               let size: AXValue = attribute(icon, kAXSizeAttribute) else { return nil }
         var origin = CGPoint.zero
         var extent = CGSize.zero
         guard AXValueGetValue(position, .cgPoint, &origin), AXValueGetValue(size, .cgSize, &extent) else { return nil }
-        return DockItem(appUrl: url, frame: CGRect(origin: origin, size: extent))
+        return CGRect(origin: origin, size: extent)
     }
 
     private static func attribute<T>(_ element: AXUIElement, _ key: String) -> T? {
@@ -80,6 +100,8 @@ class DockHoverEvents {
 enum DockPreview {
     static let showDelay = 0.3
     static let hideDelay = 0.25
+    /// The Dock's slide-in animation, after which its icons stop moving.
+    static let dockSettleDelay = 0.35
     private static var panel: DockPreviewPanel?
     private static var item: DockItem?
     private static var shownPid: pid_t?
@@ -115,6 +137,7 @@ enum DockPreview {
         monitors.removeAll()
         panel?.orderOut(nil)
         panel?.clear()
+        DockAutohideHold.end()
     }
 
     static func thumbnailUpdated(_ window: Window) {
@@ -147,7 +170,11 @@ enum DockPreview {
         showWork?.cancel()
         let work = DispatchWorkItem {
             guard item == newItem else { return }
-            show(app, newItem)
+            DockHoverEvents.settled(newItem) { settled in
+                guard item == settled else { return }
+                item = settled
+                show(app, settled)
+            }
         }
         showWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + showDelay, execute: work)
@@ -162,6 +189,23 @@ enum DockPreview {
         shownPid = app.pid
         layout(windows, newItem)
         installMonitorsIfNeeded()
+        holdDockIfNeeded()
+    }
+
+    /// The first time the panel opens, the Dock may not have finished sliding in: hold it on screen, then
+    /// move the panel to where the icon ended up.
+    private static func holdDockIfNeeded() {
+        guard !DockAutohideHold.isHolding else { return }
+        DockAutohideHold.begin()
+        guard DockAutohideHold.isHolding else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + dockSettleDelay) {
+            guard isVisible, let current = item else { return }
+            DockHoverEvents.settled(current) { settled in
+                guard isVisible, item == settled, settled.frame != current.frame, let panel else { return }
+                item = settled
+                layout(panel.windows, settled)
+            }
+        }
     }
 
     private static func layout(_ windows: [Window], _ newItem: DockItem) {
@@ -385,5 +429,40 @@ class DockPreviewTile: NSView {
     private func updateHighlight() {
         layer!.backgroundColor = isHovered ? NSColor.labelColor.withAlphaComponent(0.12).cgColor : nil
         closeButton.isHidden = !isHovered || !(previewed?.canBeClosed() ?? false)
+    }
+}
+
+/// Keeps an auto-hiding Dock on screen while the Dock preview panel is open. Without it the Dock slides away
+/// as soon as the pointer leaves it for the panel, taking the icon the panel points at with it.
+///
+/// macOS has no "stay up" request for the Dock, so this turns auto-hide off and back on, as the System
+/// Settings switch does. That setting persists, so the hold is recorded in our own defaults first: if the app
+/// quits or crashes mid-hold, the next launch (`restoreAfterCrash`) turns auto-hide back on.
+/// Main thread only.
+enum DockAutohideHold {
+    private static let pendingKey = "dockAutohideHeld"
+    private(set) static var isHolding = false
+
+    static func begin() {
+        guard !isHolding, CoreDockGetAutoHideEnabled() else { return }
+        isHolding = true
+        UserDefaults.standard.set(true, forKey: pendingKey)
+        CoreDockSetAutoHideEnabled(false)
+        Logger.debug { "Dock auto-hide held off" }
+    }
+
+    static func end() {
+        guard isHolding else { return }
+        isHolding = false
+        CoreDockSetAutoHideEnabled(true)
+        UserDefaults.standard.removeObject(forKey: pendingKey)
+        Logger.debug { "Dock auto-hide restored" }
+    }
+
+    static func restoreAfterCrash() {
+        guard UserDefaults.standard.bool(forKey: pendingKey) else { return }
+        UserDefaults.standard.removeObject(forKey: pendingKey)
+        CoreDockSetAutoHideEnabled(true)
+        Logger.info { "Dock auto-hide restored after an interrupted Dock preview" }
     }
 }

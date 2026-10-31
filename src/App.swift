@@ -531,6 +531,7 @@ extension App: NSApplicationDelegate {
         // `registerDefaults()` (they read raw plist values), which `initialize()` already guarantees.
         // This only touches UserDefaults + TIS (main-thread), so it depends on nothing below.
         Preferences.initialize()
+        DockAutohideHold.restoreAfterCrash()
         // Handle the "move to /Applications" prompt before anything else sets up the model. It runs a modal
         // alert (and may relaunch + exit), both of which pump the main run loop, so it must come before the
         // WindowServer tap below: otherwise the tap's queued window discovery drains re-entrantly during the
@@ -560,6 +561,8 @@ extension App: NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         // symbolic hotkeys state persist after the app is quit; we restore this shortcut before quitting
         setNativeCommandTabEnabled(true)
+        // like the hotkey above, a Dock auto-hide held off for a preview would outlive the app
+        DockAutohideHold.end()
         // usage counters are appended in memory and written back on a debounce; land the pending ones
         UsageStats.flushNow()
     }
