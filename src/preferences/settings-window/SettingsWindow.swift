@@ -175,6 +175,7 @@ class SettingsWindow: NSWindow {
         SettingsCard.section(NSLocalizedString("General", comment: ""), [
             switchRow(NSLocalizedString("Start at login", comment: ""), "startAtLogin"),
             switchRow(NSLocalizedString("Menubar icon", comment: ""), "menubarIconShown"),
+            switchRow(NSLocalizedString("Window previews on Dock hover", comment: ""), "dockPreviews"),
         ])
     }
 

@@ -280,6 +280,7 @@ class App: NSApplication {
     }
 
     static func showUiOrCycleSelection(_ shortcutIndex: Int, _ forceDoNothingOnRelease_: Bool) {
+        DockPreview.hideNow()
         MainThreadStall.step()
         if !SwitcherSession.isActive { DismissalInput.cancel() }
         OnboardingPopover.switcherWasSummoned()
