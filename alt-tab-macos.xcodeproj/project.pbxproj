@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D0C4F1E00000000000000002 /* DockPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4F1E00000000000000001 /* DockPreview.swift */; };
-		D0C4F1E00000000000000102 /* DockPreviewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4F1E00000000000000101 /* DockPreviewLayout.swift */; };
-		D0C4F1E00000000000000103 /* DockPreviewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4F1E00000000000000101 /* DockPreviewLayout.swift */; };
-		D0C4F1E00000000000000203 /* DockPreviewLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4F1E00000000000000201 /* DockPreviewLayoutTests.swift */; };
 		F01700000000000000000011 /* IllustrationDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01700000000000000000001 /* IllustrationDrawer.swift */; };
 		F01700000000000000000012 /* IllustrationDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01700000000000000000001 /* IllustrationDrawer.swift */; };
 		F01500000000000000000011 /* LocalizedIllustration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F01500000000000000000001 /* LocalizedIllustration.swift */; };
@@ -350,9 +346,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		D0C4F1E00000000000000001 /* DockPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockPreview.swift; sourceTree = "<group>"; };
-		D0C4F1E00000000000000101 /* DockPreviewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockPreviewLayout.swift; sourceTree = "<group>"; };
-		D0C4F1E00000000000000201 /* DockPreviewLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockPreviewLayoutTests.swift; sourceTree = "<group>"; };
 		F01700000000000000000001 /* IllustrationDrawer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllustrationDrawer.swift; sourceTree = "<group>"; };
 		F01500000000000000000001 /* LocalizedIllustration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedIllustration.swift; sourceTree = "<group>"; };
 		F01500000000000000000002 /* LocalizedIllustrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedIllustrationTests.swift; sourceTree = "<group>"; };
@@ -717,16 +710,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D0C4F1E00000000000000010 /* dock-preview */ = {
-			isa = PBXGroup;
-			children = (
-				D0C4F1E00000000000000001 /* DockPreview.swift */,
-				D0C4F1E00000000000000101 /* DockPreviewLayout.swift */,
-				D0C4F1E00000000000000201 /* DockPreviewLayoutTests.swift */,
-			);
-			path = "dock-preview";
-			sourceTree = "<group>";
-		};
 		1C961B4542D84D5B6E937B15 /* workflows */ = {
 			isa = PBXGroup;
 			children = (
@@ -1042,7 +1025,6 @@
 				BF0C8D57C86AF492D43A576D /* AppearanceTestable.swift */,
 				BF0C84933936C6FE676CD33C /* AppearanceTests.swift */,
 				AA974BA829B7D84C0099A29E /* PreviewPanel.swift */,
-				D0C4F1E00000000000000010 /* dock-preview */,
 				BF0C8D606B53D315F2D9927B /* KeyRepeatTimer.swift */,
 				5E5EA12E0000000000000001 /* KeyRepeatTimerTestable.swift */,
 				5E5EA12E0000000000000101 /* KeyRepeatTimerTests.swift */,
@@ -1746,8 +1728,6 @@
 				5E6010A00000000000000102 /* WindowTitleTests.swift in Sources */,
 				5E6010B00000000000000003 /* TileGridLayout.swift in Sources */,
 				5E6010B00000000000000102 /* TileGridLayoutTests.swift in Sources */,
-				D0C4F1E00000000000000103 /* DockPreviewLayout.swift in Sources */,
-				D0C4F1E00000000000000203 /* DockPreviewLayoutTests.swift in Sources */,
 				5E7115000000000000000003 /* TilePool.swift in Sources */,
 				5E7115000000000000000102 /* TilePoolTests.swift in Sources */,
 				5E5EA12D0000000000000003 /* ShortcutModifierResolver.swift in Sources */,
@@ -1844,8 +1824,6 @@
 				5E5EA12F0000000000000002 /* SearchFieldEditing.swift in Sources */,
 				5E6010A00000000000000002 /* WindowTitle.swift in Sources */,
 				5E6010B00000000000000002 /* TileGridLayout.swift in Sources */,
-				D0C4F1E00000000000000002 /* DockPreview.swift in Sources */,
-				D0C4F1E00000000000000102 /* DockPreviewLayout.swift in Sources */,
 				5E7115000000000000000002 /* TilePool.swift in Sources */,
 				5E5EA12D0000000000000002 /* ShortcutModifierResolver.swift in Sources */,
 				5F5849A900000000000000A2 /* BruteForceWindowMatch.swift in Sources */,

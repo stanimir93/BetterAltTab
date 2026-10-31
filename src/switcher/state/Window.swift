@@ -248,7 +248,6 @@ class Window {
         guard WindowThumbnails.acceptCapture(self, screenshot) else { return }
         thumbnail = screenshot
         capturedArea = area
-        DockPreview.thumbnailUpdated(self)
         if !SwitcherSession.isActive || !shouldShowTheUser { return }
         if let shownArea = thumbnailArea,
            let view = (TilesView.recycledViews.first { $0.window_?.cgWindowId == cgWindowId }) {

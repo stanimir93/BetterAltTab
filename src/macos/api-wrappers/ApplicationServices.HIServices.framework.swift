@@ -37,13 +37,3 @@ func GetProcessInformation(_ psn: UnsafeMutablePointer<ProcessSerialNumber>, _ i
 func GetProcessForPID(_ pid: pid_t, _ psn: UnsafeMutablePointer<ProcessSerialNumber>) -> OSStatus
 
 
-
-/// whether the Dock hides itself until the pointer reaches the screen edge (System Settings > Desktop & Dock)
-/// * macOS 10.0+
-@_silgen_name("CoreDockGetAutoHideEnabled")
-func CoreDockGetAutoHideEnabled() -> Bool
-
-/// sets the same preference as the System Settings switch, live, and persists it in com.apple.dock
-/// * macOS 10.0+
-@_silgen_name("CoreDockSetAutoHideEnabled")
-func CoreDockSetAutoHideEnabled(_ flag: Bool)

@@ -1195,7 +1195,6 @@ class Applications {
                 discoveredPid: nil, reportedPid: runningApp.processIdentifier) else { return }
             if bundleIdentifier == "com.apple.dock" {
                 DockEvents.observe(processIdentifier)
-                DockHoverEvents.observe(processIdentifier)
             }
             // com.apple.universalcontrol always fails subscribeToNotification. We blacklist it to save resources on everyone's machines
             guard bundleIdentifier != "com.apple.universalcontrol" else { return }
