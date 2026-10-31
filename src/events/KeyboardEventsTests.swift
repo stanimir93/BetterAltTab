@@ -111,6 +111,18 @@ final class KeyboardEventsUtilsTests: XCTestCase {
                        ["nextWindowShortcut", "holdShortcut", "nextWindowShortcut", "holdShortcut"])
     }
 
+    // tab-down (already carrying alt) > tab-up > alt-up, with no alt-down flags event, while
+    // NSEvent.modifierFlags still reports alt. Logi Options+'s "Switch application" button posts exactly this.
+    func testSynthesizedChordWithoutHoldDownStillReleases() throws {
+        resetState()
+        ModifierFlags.current = [.option]
+        handleKeyboardEvent(KeyboardEventsTestable.globalShortcutsIds["nextWindowShortcut"], .down, nil, nil, false)
+        handleKeyboardEvent(KeyboardEventsTestable.globalShortcutsIds["nextWindowShortcut"], .up, nil, nil, false)
+        XCTAssertEqual(ControlsTab.shortcutsActionsTriggered, ["nextWindowShortcut"])
+        handleKeyboardEvent(nil, nil, nil, [], false)
+        XCTAssertEqual(ControlsTab.shortcutsActionsTriggered, ["nextWindowShortcut", "holdShortcut"])
+    }
+
     func testRecordedReleaseSettlesTheSessionOpenedByItsDelayedHotkey() throws {
         resetState()
         ModifierFlags.current = [.option]

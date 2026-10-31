@@ -44,6 +44,7 @@ Mirrors `KeyboardEventsTests.swift` 1:1.
 - **testSequenceWithMissingEventAndWeCanNotSaveTheDay** — a dropped event it can't recover from → predictable degradation.
 - **testOutOfOrderEvents** — events arriving out of order are handled.
 - **testLostHoldReleaseIsSettledBeforeTheNextSummonCycles** — a lost modifier-up is honoured on the tile the user saw, before the next summon's key-down cycles the selection.
+- **testSynthesizedChordWithoutHoldDownStillReleases** — a ⌘⇥ posted by a mouse driver (Logi Options+ "Switch application") with no separate ⌘-down still switches on release instead of leaving the switcher open.
 - **testRecordedReleaseSettlesTheSessionOpenedByItsDelayedHotkey** — a Carbon hotkey delayed behind main-thread work still commits its own physically completed gesture.
 - **testInputLogSeparatesTwoPairsButKeepsTwoTabsUnderOneHoldTogether** — two complete Option-Tab pairs remain two sessions, while two Tab taps under one held Option remain one session.
 - **testInputLogDoesNotClaimAKeyDownFromBeforeRegistrationChanged** — input observed while a shortcut was unregistered cannot commit a later gesture.

@@ -78,6 +78,18 @@ func settleLostHoldRelease(_ recordedHoldRelease: Bool = false) {
         .settleLostRelease(recordedHoldRelease)
 }
 
+/// Carbon only fires a switching hotkey while its modifiers are down, and production registers it combined
+/// with its hold modifier, so the hotkey itself proves the hold is down. Synthesized chords need this: Logi
+/// Options+'s "Switch application" posts ⌘⇥ with no ⌘-down flagsChanged (seen in debug logs), and
+/// NSEvent.modifierFlags keeps reporting ⌘ after its flags-up. Without this the hold is never seen down, that
+/// flags-up never flips it, and the switcher stays open. Pinned by testSynthesizedChordWithoutHoldDownStillReleases.
+private func markHoldDownOnSwitchingHotkey(_ globalId: Int?, _ shortcutState: ShortcutState?) {
+    guard shortcutState == .down, let globalId,
+          let id = KeyboardEventsTestable.globalShortcutsIds.first(where: { $0.value == globalId })?.key,
+          id.hasPrefix("nextWindowShortcut") else { return }
+    ControlsTab.shortcuts[Preferences.indexToName("holdShortcut", Preferences.nameToIndex(id))]?.state = .down
+}
+
 private func shouldAbsorbSearchEditingKeyDown(_ event: NSEvent?) -> Bool {
     guard let event, event.type == .keyDown, SwitcherSession.isActive, TilesPanel.shared.isKeyWindow, TilesView.isSearchEditing else {
         return false
@@ -88,6 +100,7 @@ private func shouldAbsorbSearchEditingKeyDown(_ event: NSEvent?) -> Bool {
 private func triggerMatchingShortcuts(_ globalId: Int?, _ shortcutState: ShortcutState?, _ keyCode: UInt32?,
                                       _ modifiers: NSEvent.ModifierFlags?, _ isARepeat: Bool,
                                       _ recordedHoldRelease: Bool) -> Bool {
+    markHoldDownOnSwitchingHotkey(globalId, shortcutState)
     settleLostHoldRelease()
     var someShortcutTriggered = false
     for shortcut in ControlsTab.shortcuts.values {
